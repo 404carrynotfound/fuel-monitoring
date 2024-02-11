@@ -15,7 +15,7 @@ def login():
     user = next((user for user in users if user.username == username and user.password == password), None, )
 
     return (jsonify({"token": generate_token(user.username)}) if user
-            else jsonify({"error": "Invalid credentials"}),
+            else jsonify({"message": "Invalid credentials"}),
             200 if user else 401)
 
 
@@ -26,7 +26,7 @@ def register():
     password = data.get('password')
 
     if any(user.username == username for user in users):
-        return jsonify({"error": "User already exists"}), 400
+        return jsonify({"message": "User already exists"}), 400
 
     users.append(User(username, password))
     return jsonify({"token": generate_token(username)}), 201
