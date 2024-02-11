@@ -55,7 +55,8 @@ def get_my_fuel_records(user):
 @fuel_blueprint.route('/<record_id>', methods=['GET'])
 @auth_required
 def get_fuel_record(user, record_id):
-    return jsonify({'record': next((record for record in fuel_records if record.id == record_id), None).to_json()}), 200
+    return jsonify(
+        {'record': next((record for record in fuel_records if record.id == int(record_id)), None).to_json()}), 200
 
 
 @fuel_blueprint.route('/<record_id>', methods=['PUT'])
@@ -67,7 +68,7 @@ def update_fuel_record(record_id):
 @fuel_blueprint.route('/<record_id>', methods=['DELETE'])
 @auth_required
 def delete_fuel_record(username, record_id):
-    to_delete = find_record(record_id, username)
+    to_delete = find_record(int(record_id), username)
 
     if to_delete is None:
         return jsonify({"message": 'Record not found'}), 404
@@ -75,7 +76,7 @@ def delete_fuel_record(username, record_id):
     fuel_records.remove(to_delete)
     os.remove(to_delete.file_path)
 
-    return 204
+    return '', 204
 
 
 @fuel_blueprint.route('/daily', methods=['GET'])
