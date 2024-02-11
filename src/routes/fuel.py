@@ -19,7 +19,7 @@ def save_fuel(user):
     fuel_cost = request.form.get('fuelCost')
     vehicle_id = request.form.get('vehicleId')
 
-    if not next((vehicle for vehicle in vehicles if vehicle.id == int(vehicle_id)), None):
+    if not vehicle_id or not next((vehicle for vehicle in vehicles if vehicle.id == int(vehicle_id)), None):
         return jsonify({"message": "Missing vehicle"}), 400
 
     for file in request.files.getlist('file'):
