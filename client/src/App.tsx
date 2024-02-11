@@ -78,8 +78,7 @@ function App() {
                      } }
                 >
                     <Routes>
-                        <Route>
-                        {/*<Route element={ <PrivateRoutes/> }>*/}
+                        <Route element={ <PrivateRoutes/> }>
                             <Route path="/" element={ <Navigate to="/dashboard"/> }/>
                             <Route path="/dashboard" element={ <Dashboard/> }/>
                             <Route path="/add-fuel" element={ <AddFuel/> }/>
