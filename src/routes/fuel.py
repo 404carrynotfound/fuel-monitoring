@@ -4,6 +4,7 @@ from datetime import date
 from flask import Blueprint, request, jsonify, send_file
 
 from src.models.fuel_record import fuel_records, FuelRecord
+from src.models.vehicle_record import vehicles
 from src.utils.auth import auth_required
 from src.utils.file_helper import save_to_file
 
@@ -16,6 +17,10 @@ def save_fuel(user):
     fuel_type = request.form.get('fuelType')
     fuel_amount = request.form.get('fuelAmount')
     fuel_cost = request.form.get('fuelCost')
+    vehicle_id = request.form.get('vehicleId')
+
+    if not next((vehicle for vehicle in vehicles if vehicle.id == int(vehicle_id)), None):
+        return jsonify({"message": "Missing vehicle"}), 400
 
     for file in request.files.getlist('file'):
         file_type = file.content_type
@@ -24,7 +29,7 @@ def save_fuel(user):
             return jsonify({"message": "Invalid file type"}), 400
 
         file_path = save_to_file(user, file)
-        fuel_records.append(FuelRecord(fuel_type, fuel_amount, fuel_cost, user, file_path, file_type))
+        fuel_records.append(FuelRecord(fuel_type, fuel_amount, fuel_cost, user, vehicle_id, file_path, file_type))
 
     return jsonify({'message': 'File uploaded successfully'})
 
@@ -32,7 +37,7 @@ def save_fuel(user):
 @fuel_blueprint.route('/', methods=['GET'])
 @auth_required
 def get_fuel_records(user):
-    return 'Fuel records retrieved successfully'
+    return jsonify({'records': [record.to_json() for record in fuel_records]}), 200
 
 
 @fuel_blueprint.route('/download/<record_id>', methods=['GET'])
@@ -57,12 +62,6 @@ def get_my_fuel_records(user):
 def get_fuel_record(user, record_id):
     return jsonify(
         {'record': next((record for record in fuel_records if record.id == int(record_id)), None).to_json()}), 200
-
-
-@fuel_blueprint.route('/<record_id>', methods=['PUT'])
-@auth_required
-def update_fuel_record(record_id):
-    return 'Fuel record updated successfully'
 
 
 @fuel_blueprint.route('/<record_id>', methods=['DELETE'])
