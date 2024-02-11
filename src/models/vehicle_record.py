@@ -10,4 +10,8 @@ class VehicleRecord:
         self.username = username
         VehicleRecord.next_id += 1
 
+    def to_json(self):
+        return {'id': self.id, 'registerNumber': self.register_number, 'username': self.username}
+
+
 vehicles = [VehicleRecord('KA-01-HH-1234', 'user'), VehicleRecord('KA-01-HH-9999', 'admin')]
