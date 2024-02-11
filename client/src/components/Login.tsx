@@ -1,24 +1,39 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { FormEvent } from 'react';
+import { FormEvent, useState } from 'react';
 import { Box, Button, Grid, TextField, Typography } from '@mui/material';
+import { login } from '../service/AuthService.ts';
 
 function Login() {
 
     const navigate = useNavigate();
 
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
-        navigate('/dashboard');
+        const res = await login(email, password);
+        const json = await res.json();
+
+        if (res.status === 401) {
+            alert(json.message);
+            return;
+        }
+
+        if (json?.token) {
+            localStorage.setItem('token', json.token);
+            navigate('/dashboard');
+        }
     };
 
     return (
-        <Box sx={{
+        <Box sx={ {
             marginLeft: '35%',
             width: '30%',
             justifyContent: 'center',
             alignItems: 'center',
             alignContent: 'center',
-        }}>
+        } }>
             <Typography component="h1" variant="h5">
                 Sign in
             </Typography>
@@ -28,10 +43,11 @@ function Login() {
                     required
                     fullWidth
                     id="email"
-                    label="Email Address"
+                    label="Username"
                     name="email"
                     autoComplete="email"
                     autoFocus
+                    onChange={ e => setEmail(e.target.value) }
                 />
                 <TextField
                     margin="normal"
@@ -42,6 +58,7 @@ function Login() {
                     type="password"
                     id="password"
                     autoComplete="current-password"
+                    onChange={ e => setPassword(e.target.value) }
                 />
                 <Button
                     type="submit"
@@ -60,8 +77,7 @@ function Login() {
                 </Grid>
             </Box>
         </Box>
-    )
-        ;
+    );
 }
 
 export default Login;
